@@ -1,0 +1,15 @@
+entity display is
+	port(y: in bit_vector(3 downto 0);
+	     dsp: out bit_vector (6 downto 0));
+end display
+
+architecture mostrar of display is
+begin
+	dsp(0)<=not((not x and not z and(y xor w)) or (x and w and(y xor z)));
+	dsp(1)<=not((not x and y and (z xor w)) or x and((z and w) or (y and(not w or z))));
+	dsp(2)<=not((z and not w and (x xnor y)) or (x and y and (z xnor w)));
+	dsp(3)<=not((not x and not z and (y xor w)) or (z and ((x and not y and not w) or (y and w))));
+	dsp(4)<=not((not y and not z and not w)or (not x and z and w)or (not x and y and not z));
+	dsp(5)<=not((not x and not y and (w or z))or (y and w and(x xor z)));
+	dsp(6)<=not((not z and not w and(x xnor y))or (not x and w and (y xnor z)));
+end mostrar;
