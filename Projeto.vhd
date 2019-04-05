@@ -51,7 +51,7 @@ end component;
 
 component display   -- recebe o resultado da operação escolhida e converte em coisa do display
 	 	port(y: in bit_vector(3 downto 0); 
-		     ld: in bit;   --botao liga desliga, prototipo (falta o ctrl)
+		     ctrl: in bit_vector(1 downto 0);   --botao liga desliga, prototipo (falta o ctrl)
 	     dsp: out bit_vector (6 downto 0));
 end component;
 
@@ -66,6 +66,7 @@ signal st1:bit_vector(3 downto 0); --auxiliar para maior (pega se algarismo é m
 signal st2:bit_vector(3 downto 0); --auxiliar para menor (idem ao de cima)
 signal s3:bit_vector(3 downto 0);  --auxiliar do inversor (resposta)
 signal cf,df,ef,ff,gf: bit;        --saida cout da soma,sub,maior,menor. gf recebe a saída escolhida entre todas as anteriores
+signal ctrl: bit_vector(1 downto 0);
 	begin
 	c(0)<=NULL;  -- pra algumas operações é preciso isso
 	gen: for i in 0 to 3 generate  -- faz operação bit a bit dos componentes abaixo
@@ -79,17 +80,20 @@ signal cf,df,ef,ff,gf: bit;        --saida cout da soma,sub,maior,menor. gf rece
 	df<=d(4);  --Cout do sub (ficou "negativo")
 	ef<= st1(3) or (e(3)and(st1(2) or (e(2)and(st1(1)or (e(1)and st1(0))))));  --fórmula pra determinar se é maior
 	ff<= st2(3) or (f(3)and(st2(2) or (f(2)and(st2(1)or (f(1)and st2(0))))));  -- fórmula pro menor
+	ctrl(0)<=d(4);
+	ctrl(1)<=not ld;
 mult: for i in 0 to 3 generate
 	 uut: mux port map (a=>s1(i) , b=>s2(i) , c=>ef , d=>ff , e=>s3(i) ,s(2)=>key(2), s(1)=>key(1), s(0)=>key(0), cout=>s(i));	--mux funcionando para a saída escolhida (transmitindo resposta)
 end generate;
    multi: mux port map (a=> cf, b=> df, c=> ef, d=>ff, e=>ld, s(2)=>key(2), s(1)=>key(1), s(0)=>key(0), cout=> gf); --(mux transmitindo cout)
 cout<=gf and ld; --botao desligar
-
+   
 result: for i in 0 to 3 generate
 	saida(i)<=s(i);   --so serve pra vermos resposta na waveform
 end generate;
 disp: display port map(y(3)=>s(3) ,y(2)=>s(2) ,y(1)=>s(1) ,y(0)=>s(0) ,dsp(0)=>dsp(6),dsp(1)=>dsp(5),
-                          dsp(2)=>dsp(4),dsp(3)=>dsp(3),dsp(4)=>dsp(2),dsp(5)=>dsp(1),dsp(6)=>dsp(0), ld=>ld);
+                          dsp(2)=>dsp(4),dsp(3)=>dsp(3),dsp(4)=>dsp(2),dsp(5)=>dsp(1),dsp(6)=>dsp(0), ctrl(1)=>ctrl(1), ctrl(0)=>ctrl(0));
 	--funcao display 
 	end main;
+	
 	
